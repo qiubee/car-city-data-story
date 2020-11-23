@@ -1,4 +1,4 @@
-# Auto's in de stad - Data Story
+# Auto's in Nederland - Data Story
 
 Data story about the impact of cars in cities, municipalities and provinces in the Netherlands. Using Vue.js and the D3.js to create a data story with interactive data-visualizations comparing cities, municipalities and provinces with the amount and type of parking facilities in the Netherlands.
 
