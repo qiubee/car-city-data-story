@@ -17,6 +17,14 @@ See [**`package.json`**](package.json) for more information.
 
 ## Install
 
+Clone the repository and navigate to the directory.
+
+**Install dependencies:**
+
+```bash
+npm install
+```
+
 ## Data
 
 To make the datavisualisaton I've used several datasets. I combined them together for a complete dataset with overlapping information of the RDW dataset and location data. The data I've gathered come from the following resources:
