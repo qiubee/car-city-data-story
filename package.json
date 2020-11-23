@@ -1,0 +1,25 @@
+{
+  "name": "car-city-data-story",
+  "version": "1.0.0",
+  "description": "Data-story about the impact of cars in cities and municipalities in the Netherlands using Vue.js and D3.js.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qiubee/frontend-applications.git"
+  },
+  "keywords": [
+    "vue",
+    "d3",
+    "data-visualization",
+    "data-story"
+  ],
+  "author": "qiubee",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/qiubee/frontend-applications/issues"
+  },
+  "homepage": "https://github.com/qiubee/frontend-applications#readme"
+}
