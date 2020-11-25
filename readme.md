@@ -25,6 +25,26 @@ Clone the repository and navigate to the directory.
 npm install
 ```
 
+### Build, lint & develop
+
+**Compile files and run hot-reload development server:**
+
+```bash
+npm run serve
+```
+
+**Build app for production:**
+
+```bash
+npm run build
+```
+
+**Lint files:**
+
+```bash
+npm run lint
+```
+
 ## Data
 
 To make the datavisualisaton I've used several datasets. I combined them together for a complete dataset with overlapping information of the RDW dataset and location data. The data I've gathered come from the following resources:
