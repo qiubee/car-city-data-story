@@ -260,11 +260,10 @@ export default {
 	},
 	methods: {
 		updateMap(event) { 
-			const path = this.path;
 			const data = this.provinces;
 			const selectedOption = event.target;
 			const drawMap = this.drawMap;
-			drawMap(path, data, selectedOption)
+			drawMap(null, data, selectedOption)
 		}
 	}
 };
