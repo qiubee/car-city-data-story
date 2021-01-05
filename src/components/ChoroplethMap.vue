@@ -1,5 +1,16 @@
 <template>
-	<div id="map"></div>
+	<div id="map">
+		<svg></svg>
+	</div>
+	<form>
+		<label>De verdeling van het 
+			<select @change="updateMap" name="parking">
+			<option v-for="item in options" :value="item.value" :data-key="item.key" :key="item.id">
+				{{ item.text }}
+			</option>
+			</select>
+		</label>
+	</form>
 </template>
 
 <script>
@@ -9,26 +20,29 @@ import { addToLocalStorage, checkInLocalStorage, getFromLocalStorage, removeFrom
 
 export default {
 	name: "ChroplethMap",
-	mounted() {
-		this.createChroplethMap();
+	data() {
+		return {
+			selectedOption: String,
+			options: Array,
+			provinces: Array,
+			drawMap: Function
+		}
 	},
-	methods: {
-		async createChroplethMap() {
-			const descriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
-			const path = setupMap(600, 600);
-			const provinces = await getParkingData("parkingData", "data/parking_provinces_topo.json");
-			addSelectForm(provinces.features, descriptions);
-			drawMap(path, provinces);
+	async mounted() {
+		const descriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
+		const path = setupMap(600, 600);
+		const provinces = await getParkingData("parkingData", "data/parking_provinces_topo.json");
+		this.options = createOptions(provinces.features, descriptions);
+		drawMap(path, provinces);
 
-			function setupMap(width, height) {
+		function setupMap(width, height) {
 				const legend = {
 					width: width * 0.8,
 					height: 10,
 					title: "Parkeerplaatsen"
 				};
 
-				const svg = select("#map")
-					.insert("svg", ":first-child")
+				const svg = select("#map svg")
 					.attr("viewBox", "0 0 " + 600 + " " + 600)
 					.attr("width", width)
 					.attr("height", height);
@@ -56,9 +70,8 @@ export default {
 
 				const selectedData = dataFromKey(data.features, selected);
 
-				const svg = select("#map svg");
-				const map = select("#map svg g.map");
-				const formSelect = select("#map form select");
+				const svg = select("svg");
+				const map = select("svg g.map");
 
 				const maximum = max(selectedData);
 				const n = 10 ** (maximum.toString().length - 1);
@@ -99,21 +112,14 @@ export default {
 						// remove province(s)
 						exit.remove();
 					});
-
-				// uncomment to see exit pattern:
-				// data.features = data.features.slice(0, data.features.length - 1);
-
-				formSelect.on("change", function (event) {
-					drawMap(path, data, event.target);
-				});
 			}
 
-			function createLegend(parentSVG, width, height, title) {
-				const legend = parentSVG.append("g")
+			function createLegend(svg, width, height, title) {
+				const legend = svg.append("g")
 					.attr("class", "legend")
 					.attr("transform", `translate(${height}, ${height * 2})`);
 
-				parentSVG.insert("defs", ":first-child")
+				svg.insert("defs", ":first-child")
 					.append("linearGradient")
 					.attr("id", "linear-gradient")
 					.selectAll("stop")
@@ -144,42 +150,16 @@ export default {
 					.attr("class", "scale");
 			}
 
-			function updateLegend(parentSVG, scale) {axisBottom
-				const width = parseInt(parentSVG.select(".legend rect").attr("width")) + 9;
-				const height = parseInt(parentSVG.select(".legend rect").attr("height"));
+			function updateLegend(svg, scale) {
+				const width = parseInt(svg.select(".legend rect").attr("width")) + 9;
+				const height = parseInt(svg.select(".legend rect").attr("height"));
 				const legendScale = scaleLinear(scale, [height, width]);
 
-				parentSVG.select(".legend .scale")
+				svg.select(".legend .scale")
 					.attr("transform", "translate(-10, 20)")
 					.call(axisBottom(legendScale).ticks(3))
 					.select(".domain").remove()
 					.style("font-size", "0.85rem");
-			}
-
-			function addSelectForm(data, descriptions) {
-				const keys = listOfKeysWithNumberValue(data);
-
-				const formSelect = select("#map")
-					.append("form")
-					.append("label")
-					.text("De verdeling van het ")
-					.append("select")
-					.attr("name", "parking");
-
-				formSelect.selectAll("option")
-					.data(keys)
-					.enter()
-					.append("option")
-					.attr("value", function (d) {
-						return d.toLowerCase();
-					})
-					.attr("data-key", function (d) {
-						return d;
-					})
-					.data(descriptions)
-					.text(function (d) {
-						return d.toLowerCase();
-					});
 			}
 
 			function dataFromKey(data, keyToFilter) {
@@ -200,6 +180,17 @@ export default {
 				});
 			}
 
+			function createOptions(data, descriptions) {
+				return listOfKeysWithNumberValue(data).map(function (option, index) {
+					return {
+						value: option.toLowerCase(),
+						text: descriptions[index],
+						key: option,
+						id: index
+					}
+				});
+			}
+
 			function listOfKeysWithNumberValue(data) {
 				return data.map(function (feature) {
 					return Object.entries(feature.properties)
@@ -217,7 +208,7 @@ export default {
 					return arr.indexOf(a) === b;
 				});
 			}
-
+		
 			async function getParkingData(key, path) {
 				// test if localStorage is available
 				try {
@@ -240,6 +231,17 @@ export default {
 				const data = await json(path);
 				return feature(data, data.objects);
 			}
+
+			this.provinces = provinces;
+			this.drawMap = drawMap;
+	},
+	methods: {
+		updateMap(event) { 
+			const path = this.path;
+			const data = this.provinces;
+			const selectedOption = event.target;
+			const drawMap = this.drawMap;
+			drawMap(path, data, selectedOption)
 		}
 	}
 };
