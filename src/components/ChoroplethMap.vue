@@ -1,7 +1,7 @@
 <template>
 	<div id="map">
 		<svg></svg>
-	</div>
+	<p>Bron: <i>CBS, RDW</i>.</p>
 	<form>
 		<label>De verdeling van het 
 			<select @change="updateMap" name="parking">
@@ -11,6 +11,7 @@
 			</select>
 		</label>
 	</form>
+	</div>
 </template>
 
 <script>
