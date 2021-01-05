@@ -82,6 +82,7 @@ GeoNames is a website that stores information about geometric map details. The d
 
 * [Getting started with Vue - MDN](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started)
 * [Vue.js Cheatsheet](https://devhints.io/vue)
+* [New features in Vue 3 and how to use them - LogRocket](https://blog.logrocket.com/new-features-in-vue-3-and-how-to-use-them/)
 
 ## License
 
