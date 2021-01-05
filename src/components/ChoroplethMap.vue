@@ -5,7 +5,7 @@
 	<form>
 		<label>De verdeling van het 
 			<select @change="updateMap" name="parking">
-			<option v-for="item in options" :value="item.value" :data-key="item.key" :key="item.id">
+			<option v-for="item in options" :value="item.value" :data-key="item.key" :key="item.id" :selected="mapSelection === item.key">
 				{{ item.text }}
 			</option>
 			</select>
@@ -22,13 +22,14 @@ export default {
 	name: "ChroplethMap",
 	data() {
 		return {
-			selectedOption: String,
+			mapSelection: String,
 			options: Array,
 			provinces: Array,
 			drawMap: Function
 		}
 	},
 	async mounted() {
+		const selectedOptionName = "mapSelection";
 		const descriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
 		const path = setupMap(600, 600);
 		const provinces = await getParkingData("parkingData", "data/parking_provinces_topo.json");
@@ -64,15 +65,27 @@ export default {
 			}
 
 			function drawMap(path, data, node = null) {
-				const selected = node ?
-					node.selectedOptions.item(0).dataset.key :
-					"parkingTotal";
+				let selected = "parkingTotal";
+
+				try {
+					if (node) {
+						selected = node.selectedOptions.item(0).dataset.key;
+						addToLocalStorage(selectedOptionName, selected);
+					} else if (getFromLocalStorage(selectedOptionName)) {
+						selected = getFromLocalStorage(selectedOptionName);
+					}
+
+				} catch(err) {
+					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
+						console.error(err);
+					}
+				}
 
 				const selectedData = dataFromKey(data.features, selected);
 
 				const svg = select("svg");
 				const map = select("svg g.map");
-
+				
 				const maximum = max(selectedData);
 				const n = 10 ** (maximum.toString().length - 1);
 				const ceil = Math.ceil(maximum / n) * n;
@@ -215,8 +228,11 @@ export default {
 					addToLocalStorage("test", "test")
 					removeFromLocalStorage("test")
 				} catch(err) {
-					console.log(err)
-					return await loadJSON(path)
+					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
+						console.error(err);
+					} else {
+						return await loadJSON(path)
+					}
 				}
 				if (checkInLocalStorage(key)) {
 					return getFromLocalStorage(key);
@@ -234,6 +250,13 @@ export default {
 
 			this.provinces = provinces;
 			this.drawMap = drawMap;
+			try {
+				this.mapSelection = getFromLocalStorage(selectedOptionName);
+			} catch(err) {
+				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
+					console.error(err);
+				}
+			}
 	},
 	methods: {
 		updateMap(event) { 
