@@ -1,19 +1,22 @@
 <template>
 	<article>
 		<ArticleHeader />
-		<ChoroplethMap />
+		<ProvinceMap />
+		<MunicipalityMap />
 	</article>
 </template>
 
 <script>
-import ChoroplethMap from "./ChoroplethMap.vue"
 import ArticleHeader from "./ArticleHeader.vue";
+import ProvinceMap from "./ProvinceMap.vue"
+import MunicipalityMap from "./MunicipalityMap.vue"
 
 export default {
 	name: "Article",
 	components: {
-		ChoroplethMap,
-		ArticleHeader
+		ArticleHeader,
+		ProvinceMap,
+		MunicipalityMap
 	}
 }
 </script>
