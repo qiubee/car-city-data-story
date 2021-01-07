@@ -1,26 +1,27 @@
 <template>
-	<div id="map">
+	<div id="provinces">
 		<svg></svg>
-	<p>Bron: <i>CBS, RDW</i>.</p>
-	<form>
-		<label>De verdeling van het 
-			<select @change="updateMap" name="parking">
-			<option v-for="item in options" :value="item.value" :data-key="item.key" :key="item.id" :selected="mapSelection === item.key">
-				{{ item.text }}
-			</option>
-			</select>
-		</label>
-	</form>
+		<p>Bron: <i>CBS, RDW</i>.</p>
+		<form>
+			<label>De verdeling van het
+				<select @change="updateMap" name="parking">
+					<option v-for="item in options" :value="item.value" :data-key="item.key" :key="item.id"
+						:selected="mapSelection === item.key">
+						{{ item.text }}
+					</option>
+				</select>
+			</label>
+		</form>
 	</div>
 </template>
 
 <script>
 import { select, max, scaleSequential, axisBottom, scaleLinear, schemeBuPu, interpolateBuPu, geoMercator, geoPath, json } from "d3";
 import { feature } from "topojson";
-import { addToLocalStorage, checkInLocalStorage, getFromLocalStorage, removeFromLocalStorage } from "../helpers/storage.js"
+import { addToLocalStorage, getFromLocalStorage } from "../helpers/storage.js"
 
 export default {
-	name: "ChroplethMap",
+	name: "ProvinceMap",
 	data() {
 		return {
 			mapSelection: String,
@@ -33,7 +34,7 @@ export default {
 		const selectedOptionName = "mapSelection";
 		const descriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
 		const path = setupMap(600, 600);
-		const provinces = await getParkingData("parkingData", "data/parking_provinces_topo.json");
+		const provinces = await loadJSON("data/parking_provinces_topo.json");
 		this.options = createOptions(provinces.features, descriptions);
 		drawMap(path, provinces);
 
@@ -44,7 +45,7 @@ export default {
 					title: "Parkeerplaatsen"
 				};
 
-				const svg = select("#map svg")
+				const svg = select("svg")
 					.attr("viewBox", "0 0 " + 600 + " " + 600)
 					.attr("width", width)
 					.attr("height", height);
@@ -75,7 +76,6 @@ export default {
 					} else if (getFromLocalStorage(selectedOptionName)) {
 						selected = getFromLocalStorage(selectedOptionName);
 					}
-
 				} catch(err) {
 					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
 						console.error(err);
@@ -223,27 +223,6 @@ export default {
 				});
 			}
 		
-			async function getParkingData(key, path) {
-				// test if localStorage is available
-				try {
-					addToLocalStorage("test", "test")
-					removeFromLocalStorage("test")
-				} catch(err) {
-					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
-						console.error(err);
-					} else {
-						return await loadJSON(path)
-					}
-				}
-				if (checkInLocalStorage(key)) {
-					return getFromLocalStorage(key);
-				} else {
-					const data = await loadJSON(path);
-					addToLocalStorage(key, data);
-					return data;
-				}
-			}
-
 			async function loadJSON(path) {
 				const data = await json(path);
 				return feature(data, data.objects);
