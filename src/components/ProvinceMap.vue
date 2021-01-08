@@ -39,93 +39,93 @@ export default {
 		drawMap(path, provinces);
 
 		function setupMap(width, height) {
-				const legend = {
-					width: width * 0.8,
-					height: 10,
-					title: "Parkeerplaatsen"
-				};
+			const legend = {
+				width: width * 0.8,
+				height: 10,
+				title: "Parkeerplaatsen"
+			};
 
-				const svg = select("svg")
-					.attr("viewBox", "0 0 " + 600 + " " + 600)
-					.attr("width", width)
-					.attr("height", height);
+			const svg = select("#provinces svg")
+				.attr("viewBox", "0 0 " + 600 + " " + 600)
+				.attr("width", width)
+				.attr("height", height);
 
-				svg.append("g")
-					.attr("class", "map");
+			svg.append("g")
+				.attr("class", "map");
 
-				createLegend(svg, legend.width, legend.height, legend.title);
+			createLegend(svg, legend.width, legend.height, legend.title);
 
-				const scale = width * height / 50;
+			const scale = width * height / 50;
 
-				const projection = geoMercator()
-					.rotate([5.38763888888889, 0])
-					.center([0, 52.15616055555555])
-					.scale(scale)
-					.translate([-990, height / 2]);
-				const path = geoPath().projection(projection);
-				return path;
+			const projection = geoMercator()
+				.rotate([5.38763888888889, 0])
+				.center([0, 52.15616055555555])
+				.scale(scale)
+				.translate([-990, height / 2]);
+			const path = geoPath().projection(projection);
+			return path;
+		}
+
+		function drawMap(path, data, node = null) {
+			let selected = "parkingTotal";
+
+			try {
+				if (node) {
+					selected = node.selectedOptions.item(0).dataset.key;
+					addToLocalStorage(selectedOptionName, selected);
+				} else if (getFromLocalStorage(selectedOptionName)) {
+					selected = getFromLocalStorage(selectedOptionName);
+				}
+			} catch(err) {
+				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
+					console.error(err);
+				}
 			}
 
-			function drawMap(path, data, node = null) {
-				let selected = "parkingTotal";
+			const selectedData = dataFromKey(data.features, selected);
+			
+			const svg = select("#provinces svg");
+			const map = select("#provinces svg g.map");
+			
+			const maximum = max(selectedData);
+			const n = 10 ** (maximum.toString().length - 1);
+			const ceil = Math.ceil(maximum / n) * n;
+			const scale = [0, ceil];
+			const color = scaleSequential(scale, interpolateBuPu);
 
-				try {
-					if (node) {
-						selected = node.selectedOptions.item(0).dataset.key;
-						addToLocalStorage(selectedOptionName, selected);
-					} else if (getFromLocalStorage(selectedOptionName)) {
-						selected = getFromLocalStorage(selectedOptionName);
-					}
-				} catch(err) {
-					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
-						console.error(err);
-					}
-				}
+			updateLegend(svg, scale);
 
-				const selectedData = dataFromKey(data.features, selected);
-
-				const svg = select("svg");
-				const map = select("svg g.map");
-				
-				const maximum = max(selectedData);
-				const n = 10 ** (maximum.toString().length - 1);
-				const ceil = Math.ceil(maximum / n) * n;
-				const scale = [0, ceil];
-				const color = scaleSequential(scale, interpolateBuPu);
-
-				updateLegend(svg, scale);
-
-				map.selectAll("path")
-					.data(data.features)
-					.join(function (enter) {
-						// add path and color scale of province
-						enter.append("path")
-							.attr("class", "province")
-							.attr("d", path)
-							.attr("stroke", "#ffffff")
-							.attr("fill", function (d) {
-								return color(d.properties[selected]);
-							})
-							// show information on hover
-							.append("title")
-							.text(function (d) {
-								const info = d.properties;
-								return `Provincie ${info.province} \n${info[selected]} parkeerplaatsen`;
-							});
-					}, function (update) {
-						// update color and information of province
-						update.attr("fill", function (d) {
-								return color(d.properties[selected]);
-							})
-							.selectAll("title")
-							.text(function (d) {
-								const info = d.properties;
-								return `Provincie ${info.province}\n${info[selected]} parkeerplaatsen`;
-							});
-					}, function (exit) {
-						// remove province(s)
-						exit.remove();
-					});
+			map.selectAll("path")
+				.data(data.features)
+				.join(function (enter) {
+					// add path and color scale of province
+					enter.append("path")
+						.attr("class", "province")
+						.attr("d", path)
+						.attr("stroke", "#ffffff")
+						.attr("fill", function (d) {
+							return color(d.properties[selected]);
+						})
+						// show information on hover
+						.append("title")
+						.text(function (d) {
+							const info = d.properties;
+							return `Provincie ${info.province} \n${info[selected]} parkeerplaatsen`;
+						});
+				}, function (update) {
+					// update color and information of province
+					update.attr("fill", function (d) {
+							return color(d.properties[selected]);
+						})
+						.selectAll("title")
+						.text(function (d) {
+							const info = d.properties;
+							return `Provincie ${info.province}\n${info[selected]} parkeerplaatsen`;
+						});
+				}, function (exit) {
+					// remove province(s)
+					exit.remove();
+				});
 			}
 
 			function createLegend(svg, width, height, title) {
@@ -241,6 +241,7 @@ export default {
 	methods: {
 		updateMap(event) { 
 			const data = this.provinces;
+			console.log(data)
 			const selectedOption = event.target;
 			const drawMap = this.drawMap;
 			drawMap(null, data, selectedOption)
