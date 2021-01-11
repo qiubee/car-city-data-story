@@ -13,8 +13,8 @@
 			</label>
 			<label>De verdeling van het
 				<select @change="updateView" name="parking">
-					<option v-for="item in parkingInfoOptions" :value="item.value" :data-key="item.key" :key="item.id"
-						:selected="parkingInfoSelection === item.key">
+					<option v-for="item in parkingOptions" :value="item.value" :data-key="item.key" :key="item.id"
+						:selected="parkingSelection === item.key">
 						{{ item.text }}
 					</option>
 				</select>
@@ -33,11 +33,9 @@ export default {
 	data() {
 		return {
 			provinceSelection: String,
-			parkingInfoSelection: String,
+			parkingSelection: String,
 			provinceOptions: Array,
-			parkingInfoOptions: Array,
-			municipalities: Array,
-			drawMap: Function
+			parkingOptions: Array
 		}
 	},
 	async mounted() {
@@ -47,25 +45,25 @@ export default {
 			text: "Alle provincies",
 			key: "all"
 		}
-		const path = setupMap(600, 600);
+		const legend = {
+				width: 600 * 0.8,
+				height: 10,
+				title: "Parkeerplaatsen",
+				colorEmpty: "rgb(255, 226, 225)"
+			};
+		const vm = this;
+		const path = setupMap(600, 600, legend);
 		const municipalities = await loadJSON("data/parking_municipalities_topo.json");
-		this.parkingInfoOptions = createOptions(municipalities.features, {
+		this.parkingOptions = createOptions(municipalities.features, {
 			descriptions: parkingInfoDescriptions
 		});
 		this.provinceOptions = createOptions(municipalities.features, {
 			selection: /province/g,
 			default: provinceDefaultOption
 		})
-		drawMap(path, municipalities, null);
+		drawMap(path, municipalities);
 
-		function setupMap(width, height) {
-			const legend = {
-				width: width * 0.8,
-				height: 10,
-				title: "Parkeerplaatsen",
-				colorEmpty: "rgb(255, 226, 225)"
-			};
-
+		function setupMap(width, height, legend) {
 			const svg = select("#municipalities svg")
 				.attr("viewBox", "0 0 " + 600 + " " + 600)
 				.attr("width", width)
@@ -87,19 +85,27 @@ export default {
 			return path;
 		}
 
-		function drawMap(path, data, node = null) {
-			const selectType = node ? node.attributes[0].value : null;
+		function drawMap(path, data) {
+			const parkingLSKey = "municipalityParkingSelection";
 			const provinceLSKey = "provinceSelection";
-			const parkingInfoLSKey = "municipalityParkingSelection";
 
-			const parkingSelection = selectType === "parking" 
-				? getSelectedOptionData(node, parkingInfoLSKey) 
+			const parkingSelectNode = document.querySelector("#municipalities select[name=\"parking\"]");
+			const provinceSelectNode = document.querySelector("#municipalities select[name=\"provinces\"]");
+
+			const parkingSelection = getSelectedOption(parkingSelectNode, parkingLSKey) 
+				? getSelectedOption(parkingSelectNode, parkingLSKey)
 				: "parkingTotal";
-			const provinceSelection = selectType === "provinces" 
-				? getSelectedOptionData(node, provinceLSKey) 
-				: "all";
 
-			const selectedProvince = filterProvince(data.features, provinceSelection)
+			// Bug: will set key for parkingSelection in localStorage
+			const provinceSelection = getSelectedOption(provinceSelectNode, parkingLSKey) 
+				? getSelectedOption(provinceSelectNode, provinceLSKey)
+				: "all";
+			
+			vm.provinceSelection = provinceSelection;
+			vm.parkingSelection = parkingSelection;
+
+			const selectedProvince = filterProvince(data.features, provinceSelection);
+
 			const parkingData = dataFromKey(selectedProvince, parkingSelection);
 			
 			const svg = select("#municipalities svg");
@@ -114,6 +120,7 @@ export default {
 
 			updateLegend(svg, scale);
 
+			// Bug: renders the wrong municipalities and set incorrect colors
 			map.selectAll("path")
 				.data(selectedProvince)
 				.join(function (enter) {
@@ -153,7 +160,7 @@ export default {
 							if (info[parkingSelection] === null) {
 								return `Gemeente ${info.municipality} \nAantal onbekend`
 							}
-							return `Gemeente ${info.province}\n${info[parkingSelection]} parkeerplaatsen`;
+							return `Gemeente ${info.municipality}\n${info[parkingSelection]} parkeerplaatsen`;
 						});
 				}, function (exit) {
 					// remove municipality
@@ -295,21 +302,19 @@ export default {
 			});
 		}
 
-		function getSelectedOptionData(node, localStorageKey) {
+		function getSelectedOption(node, localStorageKey) {
 			try {
-				if (node) {
+				if (node && node.length > 0) {
 					const data = node.selectedOptions.item(0).dataset.key;
 					addToLocalStorage(localStorageKey, data);
 					return data;
-				} else if (getFromLocalStorage(localStorageKey)) {
-					return getFromLocalStorage(localStorageKey);
 				} else {
-					return null;
+					return getFromLocalStorage(localStorageKey);
 				}
 			} catch(err) {
 				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
 					console.error(err);
-				} else if (node) {
+				} else if (node && node.length > 0) {
 					return node.selectedOptions.item(0).dataset.key;
 				} else {
 					return null;
@@ -356,12 +361,12 @@ export default {
 		this.drawMap = drawMap;
 	},
 	methods: {
-		updateView(event) { 
+		updateView() { 
 			const data = this.municipalities;
 			const path = this.path;
-			const selectedOption = event.target;
 			const drawMap = this.drawMap;
-			drawMap(path, data, selectedOption)
+			console.log(data)
+			drawMap(path, data)
 		}
 	}
 }
