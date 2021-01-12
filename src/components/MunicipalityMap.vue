@@ -85,7 +85,7 @@ export default {
 			return path;
 		}
 
-		function drawMap(path, data) {
+		function drawMap(path, data, node = null) {
 			const parkingLSKey = "municipalityParkingSelection";
 			const provinceLSKey = "provinceSelection";
 
@@ -121,7 +121,11 @@ export default {
 
 			updateLegend(svg, scale);
 
-			// Bug: renders the wrong municipalities and set incorrect colors
+			if (node && node.name === "provinces") {
+				map.selectAll("path")
+					.remove();
+			}
+			
 			map.selectAll("path")
 				.data(selectedProvince)
 				.join(function (enter) {
@@ -368,11 +372,11 @@ export default {
 		this.drawMap = drawMap;
 	},
 	methods: {
-		updateView() { 
+		updateView(event) { 
 			const data = this.municipalities;
 			const path = this.path;
 			const drawMap = this.drawMap;
-			drawMap(path, data)
+			drawMap(path, data, event.target)
 		}
 	}
 }
