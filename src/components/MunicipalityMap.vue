@@ -92,14 +92,15 @@ export default {
 			const parkingSelectNode = document.querySelector("#municipalities select[name=\"parking\"]");
 			const provinceSelectNode = document.querySelector("#municipalities select[name=\"provinces\"]");
 
-			const parkingSelection = getSelectedOption(parkingSelectNode, parkingLSKey) 
-				? getSelectedOption(parkingSelectNode, parkingLSKey)
-				: "parkingTotal";
+			let parkingSelection = getSelectedOption(parkingSelectNode, parkingLSKey);
+			let provinceSelection = getSelectedOption(provinceSelectNode, provinceLSKey);
 
-			// Bug: will set key for parkingSelection in localStorage
-			const provinceSelection = getSelectedOption(provinceSelectNode, parkingLSKey) 
-				? getSelectedOption(provinceSelectNode, provinceLSKey)
-				: "all";
+			if (!parkingSelection) {
+				parkingSelection = "parkingTotal";
+			}
+			if (!provinceSelection) {
+				provinceSelection = "all";
+			}
 			
 			vm.provinceSelection = provinceSelection;
 			vm.parkingSelection = parkingSelection;
@@ -308,8 +309,10 @@ export default {
 					const data = node.selectedOptions.item(0).dataset.key;
 					addToLocalStorage(localStorageKey, data);
 					return data;
-				} else {
+				} else if (node && node.length < 1) {
 					return getFromLocalStorage(localStorageKey);
+				} else {
+					return null;
 				}
 			} catch(err) {
 				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
@@ -365,7 +368,6 @@ export default {
 			const data = this.municipalities;
 			const path = this.path;
 			const drawMap = this.drawMap;
-			console.log(data)
 			drawMap(path, data)
 		}
 	}
