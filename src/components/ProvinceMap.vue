@@ -26,7 +26,6 @@ export default {
 		return {
 			mapSelection: String,
 			options: Array,
-			provinces: Array,
 			drawMap: Function
 		}
 	},
@@ -88,7 +87,7 @@ export default {
 			const map = select("#provinces svg g.map");
 			
 			const maximum = max(selectedData);
-			const n = 10 ** (maximum.toString().length - 1);
+			const n = 10 ** (maximum.toString().length - 2);
 			const ceil = Math.ceil(maximum / n) * n;
 			const scale = [0, ceil];
 			const color = scaleSequential(scale, interpolateBuPu);
@@ -241,7 +240,6 @@ export default {
 	methods: {
 		updateMap(event) { 
 			const data = this.provinces;
-			console.log(data)
 			const selectedOption = event.target;
 			const drawMap = this.drawMap;
 			drawMap(null, data, selectedOption)
