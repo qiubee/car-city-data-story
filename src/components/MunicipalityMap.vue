@@ -113,7 +113,7 @@ export default {
 			const map = select("#municipalities svg g.map");
 			
 			const maximum = max(parkingData);
-			const n = 10 ** (maximum.toString().length - 1);
+			const n = 10 ** (maximum.toString().length - 2);
 			const ceil = Math.ceil(maximum / n) * n;
 			const scale = [0, ceil];
 			const color = scaleSequential(scale, interpolateBuPu);
@@ -131,10 +131,11 @@ export default {
 						.attr("d", path)
 						.attr("stroke", "#ffffff")
 						.attr("fill", function (d) {
-							if (!d.properties[parkingSelection]) {
+							const data = d.properties[parkingSelection];
+							if (data === null) {
 								return emptyColor;
 							} else {
-								return color(d.properties[parkingSelection]);
+								return color(data);
 							}
 						})
 						// show information on hover
@@ -142,14 +143,16 @@ export default {
 						.text(function (d) {
 							const info = d.properties;
 							if (info[parkingSelection] === null) {
-								return `Gemeente ${info.municipality} \nAantal onbekend`
+								return `Gemeente ${info.municipality} \nGegevens onbekend`;
+							} else {
+								return `Gemeente ${info.municipality} \n${info[parkingSelection]} parkeerplaatsen`;
 							}
-							return `Gemeente ${info.municipality} \n${info[parkingSelection]} parkeerplaatsen`;
 						});
 				}, function (update) {
 					// update color and information of municipality
 					update.attr("fill", function (d) {
-							if (!d.properties[parkingSelection]) {
+							const data = d.properties[parkingSelection];
+							if (data === null) {
 								return emptyColor;
 							} else {
 								return color(d.properties[parkingSelection]);
@@ -159,9 +162,10 @@ export default {
 						.text(function (d) {
 							const info = d.properties;
 							if (info[parkingSelection] === null) {
-								return `Gemeente ${info.municipality} \nAantal onbekend`
+								return `Gemeente ${info.municipality} \nGegevens onbekend`;
+							} else {
+								return `Gemeente ${info.municipality}\n${info[parkingSelection]} parkeerplaatsen`;
 							}
-							return `Gemeente ${info.municipality}\n${info[parkingSelection]} parkeerplaatsen`;
 						});
 				}, function (exit) {
 					// remove municipality
