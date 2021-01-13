@@ -39,7 +39,7 @@ export default {
 		}
 	},
 	async mounted() {
-		const parkingInfoDescriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
+		const parkingInfoDescriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
 		const provinceDefaultOption = {
 			value: "all",
 			text: "Alle provincies",
@@ -48,7 +48,7 @@ export default {
 		const legend = {
 				width: 600 * 0.8,
 				height: 10,
-				title: "Parkeerplaatsen",
+				title: "parkeergelegenheden",
 				colorEmpty: "rgb(255, 226, 225)"
 			};
 		const vm = this;
@@ -149,7 +149,7 @@ export default {
 							if (info[parkingSelection] === null) {
 								return `Gemeente ${info.municipality} \nGegevens onbekend`;
 							} else {
-								return `Gemeente ${info.municipality} \n${info[parkingSelection]} parkeerplaatsen`;
+								return `Gemeente ${info.municipality} \n${info[parkingSelection]} parkeergelegenheden`;
 							}
 						});
 				}, function (update) {
@@ -168,13 +168,13 @@ export default {
 							if (info[parkingSelection] === null) {
 								return `Gemeente ${info.municipality} \nGegevens onbekend`;
 							} else {
-								return `Gemeente ${info.municipality}\n${info[parkingSelection]} parkeerplaatsen`;
+								return `Gemeente ${info.municipality}\n${info[parkingSelection]} parkeergelegenheden`;
 							}
 						});
 				}, function (exit) {
 					// remove municipality
 					exit.remove();
-				});
+			});
 		}
 
 		function createLegend(svg, options) {
@@ -356,10 +356,7 @@ export default {
 					}, []);
 			}).reduce(function (acc, arr) {
 				return acc.concat(arr);
-			})
-			// .filter(function (a, b, arr) {
-			// 		return arr.indexOf(a) === b;
-			// });
+			});
 		}
 		
 		async function loadJSON(path) {
