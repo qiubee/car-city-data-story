@@ -40,20 +40,22 @@ export default {
 	},
 	async mounted() {
 		const parkingInfoDescriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
+		const noDataColor = "rgb(131, 135, 141)";
 		const provinceDefaultOption = {
 			value: "all",
 			text: "Alle provincies",
 			key: "all"
-		}
+		};
 		const legend = {
 				width: 600 * 0.8,
 				height: 10,
 				title: "parkeergelegenheden",
-				colorEmpty: "rgb(255, 226, 225)"
-			};
+				noDataColor: noDataColor
+		};
 		const vm = this;
 		const path = setupMap(600, 600, legend);
 		const municipalities = await loadJSON("data/parking_municipalities_topo.json");
+		const zoomCoordinates = await json("data/zoom_coordinates.json");
 		this.parkingOptions = createOptions(municipalities.features, {
 			descriptions: parkingInfoDescriptions
 		});
@@ -117,7 +119,6 @@ export default {
 			const ceil = Math.ceil(maximum / n) * n;
 			const scale = [0, ceil];
 			const color = scaleSequential(scale, interpolateBuPu);
-			const emptyColor = "rgb(255, 226, 225)";
 
 			updateLegend(svg, scale);
 
@@ -133,11 +134,11 @@ export default {
 					enter.append("path")
 						.attr("class", "municipality")
 						.attr("d", path)
-						.attr("stroke", "#ffffff")
+						.attr("stroke", "rgb(178, 172, 171")
 						.attr("fill", function (d) {
 							const data = d.properties[parkingSelection];
 							if (data === null) {
-								return emptyColor;
+								return noDataColor;
 							} else {
 								return color(data);
 							}
@@ -157,7 +158,7 @@ export default {
 					update.attr("fill", function (d) {
 							const data = d.properties[parkingSelection];
 							if (data === null) {
-								return emptyColor;
+								return noDataColor;
 							} else {
 								return color(d.properties[parkingSelection]);
 							}
@@ -175,6 +176,27 @@ export default {
 					// remove municipality
 					exit.remove();
 			});
+
+		// zoom in on selected province
+		map.call(zoom);
+
+		function zoom(selection) {
+			let scale = 1;
+			let x = 0
+			let y = 0;
+			if (provinceSelection && provinceSelection !== "all") {
+				for (const item of zoomCoordinates.provinces) {
+					if (item.province === provinceSelection) {
+						x = item.coordinates.x;
+						y = item.coordinates.y;
+						scale = item.scale;
+					}
+				}
+			}
+			selection.transition()
+				.duration(750)
+				.attr("transform", `translate(${x}, ${y}) scale(${scale})`);
+			}
 		}
 
 		function createLegend(svg, options) {
@@ -208,7 +230,7 @@ export default {
 				.attr("transform", `translate(${width / 2}, ${height})`)
 				.attr("fill", "url(#linear-gradient)");
 
-			if (options.colorEmpty) {
+			if (options.noDataColor) {
 				const unknownData = legend.append("g")
 					.attr("class", "unknown")
 				
@@ -218,7 +240,7 @@ export default {
 					.attr("width", height)
 					.attr("height", height)
 					.attr("transform", `translate(${width / 4}, ${height * 1.025})`)
-					.attr("fill", options.colorEmpty);
+					.attr("fill", options.noDataColor);
 				
 				unknownData.append("text")
 					.text("onbekend")
@@ -243,8 +265,11 @@ export default {
 
 			svg.select(".legend .scale")
 				.attr("transform", "translate(-10, 20)")
+				.transition()
+				.duration(750)
 				.call(axisBottom(legendScale).ticks(3))
 				.select(".domain").remove()
+				.style("stroke", "none")
 				.style("font-size", "0.85rem");
 		}
 
