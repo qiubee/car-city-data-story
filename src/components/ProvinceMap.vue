@@ -31,7 +31,7 @@ export default {
 	},
 	async mounted() {
 		const selectedOptionName = "mapSelection";
-		const descriptions = ["Totaal aantal parkeerplaatsen", "Totaal aantal parkeerplaatsen die het hele jaar open zijn", "Totaal aantal parkeerplaatsen met de uitgang altijd open"];
+		const descriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
 		const path = setupMap(600, 600);
 		const provinces = await loadJSON("data/parking_provinces_topo.json");
 		this.options = createOptions(provinces.features, descriptions);
@@ -41,7 +41,7 @@ export default {
 			const legend = {
 				width: width * 0.8,
 				height: 10,
-				title: "Parkeerplaatsen"
+				title: "parkeergelegenheden"
 			};
 
 			const svg = select("#provinces svg")
@@ -109,7 +109,7 @@ export default {
 						.append("title")
 						.text(function (d) {
 							const info = d.properties;
-							return `Provincie ${info.province} \n${info[selected]} parkeerplaatsen`;
+							return `Provincie ${info.province} \n${info[selected]} parkeergelegenheden`;
 						});
 				}, function (update) {
 					// update color and information of province
@@ -119,7 +119,7 @@ export default {
 						.selectAll("title")
 						.text(function (d) {
 							const info = d.properties;
-							return `Provincie ${info.province}\n${info[selected]} parkeerplaatsen`;
+							return `Provincie ${info.province}\n${info[selected]} parkeergelegenheden`;
 						});
 				}, function (exit) {
 					// remove province(s)
