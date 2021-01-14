@@ -1,22 +1,33 @@
 <template>
 	<article>
-		<ArticleHeader />
+		<header>
+			<Markdown :content="intro" />
+		</header>
 		<ProvinceMap />
 		<MunicipalityMap />
 	</article>
 </template>
 
 <script>
-import ArticleHeader from "./ArticleHeader.vue";
+import Markdown from "./Markdown.vue";
 import ProvinceMap from "./ProvinceMap.vue"
 import MunicipalityMap from "./MunicipalityMap.vue"
+import intro from "../assets/story/intro.md"
 
 export default {
 	name: "Article",
 	components: {
-		ArticleHeader,
+		Markdown,
 		ProvinceMap,
 		MunicipalityMap
+	},
+	data() {
+		return {
+			intro: String
+		}
+	},
+	created() {
+		this.intro = intro;
 	}
 }
 </script>
