@@ -26,8 +26,10 @@
   },
   "homepage": "https://github.com/qiubee/frontend-applications#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "core-js": "^3.7.0",
     "d3": "^6.2.0",
+    "showdown": "^1.9.1",
     "topojson": "^3.0.2",
     "vue": "^3.0.2"
   },
@@ -39,7 +41,8 @@
     "@vue/compiler-sfc": "^3.0.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.14.0",
-    "eslint-plugin-vue": "^7.1.0"
+    "eslint-plugin-vue": "^7.1.0",
+    "raw-loader": "^4.0.2"
   },
   "eslintConfig": {
     "root": true,
