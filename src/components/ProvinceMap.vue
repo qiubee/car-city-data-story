@@ -193,8 +193,11 @@ export default {
 
 				svg.select(".legend .scale")
 					.attr("transform", "translate(-10, 20)")
+					.transition()
+					.duration(750)
 					.call(axisBottom(legendScale).ticks(3))
 					.select(".domain").remove()
+					.style("stroke", "none")
 					.style("font-size", "0.85rem");
 			}
 
