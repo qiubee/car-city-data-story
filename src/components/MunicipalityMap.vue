@@ -62,7 +62,7 @@ export default {
 		// import json data
 		const municipalities = await loadGeoJSON("data/parking_municipalities_topo.json");
 		const zoomCoordinates = await json("data/zoom_coordinates.json");
-		// create select with options for parking & province data and save options in Vue instance
+		// create options from parking & province data and save options in Vue instance
 		this.parkingOptions = createOptions(municipalities.features, {
 			descriptions: parkingInfoDescriptions
 		});
