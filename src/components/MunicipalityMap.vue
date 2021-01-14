@@ -302,14 +302,14 @@ export default {
 		}
 
 		// create select options from data
-		function createOptions(data, options) {
+		function createOptions(data, options = null) {
 			let keys = [];
-			if (!options.selection) {
-				// get keys from data
-				keys = listOfKeysWithNumberValue(data)
-			} else {
+			if (options.selection) {
 				// get keys from selection
 				keys = getDataFromSelection(data, options.selection)
+			} else {
+				// get keys from data
+				keys = listOfKeysWithNumberValue(data)
 			}
 			// create option objects
 			const result = keys.map(function (option, index) {
