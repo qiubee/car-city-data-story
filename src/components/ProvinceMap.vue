@@ -33,7 +33,7 @@ export default {
 		const selectedOptionName = "mapSelection";
 		const descriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
 		const path = setupMap(600, 600);
-		const provinces = await loadJSON("data/parking_provinces_topo.json");
+		const provinces = await loadGeoJSON("data/parking_provinces_topo.json");
 		this.options = createOptions(provinces.features, descriptions);
 		drawMap(path, provinces);
 
@@ -41,7 +41,7 @@ export default {
 			const legend = {
 				width: width * 0.8,
 				height: 10,
-				title: "parkeergelegenheden"
+				title: "Parkeergelegenheden"
 			};
 
 			const svg = select("#provinces svg")
@@ -52,7 +52,7 @@ export default {
 			svg.append("g")
 				.attr("class", "map");
 
-			createLegend(svg, legend.width, legend.height, legend.title);
+			createLegend(svg, legend);
 
 			const scale = width * height / 50;
 
@@ -127,7 +127,11 @@ export default {
 				});
 			}
 
-			function createLegend(svg, width, height, title) {
+			function createLegend(svg, options) {
+				const height = options.height ? options.height : 500;
+				const width = options.width ? options.width : 500;
+				const title = options.title ? options.title : "Legend";
+
 				const legend = svg.append("g")
 					.attr("class", "legend")
 					.attr("transform", `translate(${height}, ${height * 2})`);
@@ -161,6 +165,25 @@ export default {
 
 				legend.append("g")
 					.attr("class", "scale");
+
+				if (options.noDataColor) {
+					const unknownData = legend.append("g")
+						.attr("class", "unknown")
+					
+					unknownData.append("rect")
+						.attr("x", -width / 4)
+						.attr("y", height * 4)
+						.attr("width", height)
+						.attr("height", height)
+						.attr("transform", `translate(${width / 4}, ${height * 1.025})`)
+						.attr("fill", options.noDataColor);
+					
+					unknownData.append("text")
+						.text("onbekend")
+						.attr("transform", `translate(${height * 1.5}, 60)`)
+						.style("font-weight", "400")
+						.style("font-size", "0.8rem");
+				}
 			}
 
 			function updateLegend(svg, scale) {
@@ -193,16 +216,36 @@ export default {
 				});
 			}
 
-			function createOptions(data, descriptions) {
-				return listOfKeysWithNumberValue(data).map(function (option, index) {
-					return {
-						value: option.toLowerCase(),
-						text: descriptions[index],
-						key: option,
-						id: index
-					}
+			function createOptions(data, options = null) {
+			let keys = [];
+			if (options.selection) {
+				// get keys from selection
+				keys = getDataFromSelection(data, options.selection)
+			} else {
+				// get keys from data
+				keys = listOfKeysWithNumberValue(data)
+			}
+			// create option objects
+			const result = keys.map(function (option, index) {
+				const content = options.descriptions 
+					? options.descriptions[index] 
+					: option;
+				return {
+					value: option.toLowerCase(),
+					text: content,
+					key: option,
+					id: index
+				}
+			});
+			// add default option to options & update indexing
+			if (options.default) {
+				result.splice(0, 0, options.default);
+				result.map(function (item, i) {
+					return item.id = i;
 				});
 			}
+			return result;
+		}
 
 			function listOfKeysWithNumberValue(data) {
 				return data.map(function (feature) {
@@ -221,8 +264,26 @@ export default {
 					return arr.indexOf(a) === b;
 				});
 			}
+
+			function getDataFromSelection(data, selection) {
+				return data.map(function (feature) {
+					return Object.entries(feature.properties)
+						.reduce(function (acc, property) {
+							const key = property[0];
+							const value = property[1];
+							if (key.match(selection)) {
+								acc.push(value);
+							}
+							return acc;
+						}, []);
+				}).reduce(function (acc, arr) {
+					return acc.concat(arr);
+				}).filter(function (a, b, arr) {
+					return arr.indexOf(a) === b;
+				});
+			}
 		
-			async function loadJSON(path) {
+			async function loadGeoJSON(path) {
 				const data = await json(path);
 				return feature(data, data.objects);
 			}
