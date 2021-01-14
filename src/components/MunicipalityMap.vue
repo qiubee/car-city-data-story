@@ -428,6 +428,7 @@ export default {
 			return feature(data, data.objects);
 		}
 
+		// save data to Vue instance
 		this.municipalities = municipalities;
 		this.path = path;
 		this.drawMap = drawMap;
