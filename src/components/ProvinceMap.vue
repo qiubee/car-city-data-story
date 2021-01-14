@@ -30,11 +30,13 @@ export default {
 		}
 	},
 	async mounted() {
-		const selectedOptionName = "mapSelection";
-		const descriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
+		const parkingLSKey = "mapSelection";
+		const parkingDescriptions = ["Totaal aantal parkeergelegenheden", "Totaal aantal parkeergelegenheden die het hele jaar open zijn", "Totaal aantal parkeergelegenheden met de uitgang altijd open"];
 		const path = setupMap(600, 600);
 		const provinces = await loadGeoJSON("data/parking_provinces_topo.json");
-		this.options = createOptions(provinces.features, descriptions);
+		this.options = createOptions(provinces.features, {
+			descriptions: parkingDescriptions
+		});
 		drawMap(path, provinces);
 
 		function setupMap(width, height) {
@@ -66,22 +68,13 @@ export default {
 		}
 
 		function drawMap(path, data, node = null) {
-			let selected = "parkingTotal";
+			let parkingSelection = getSelectedOption(node, parkingLSKey);
 
-			try {
-				if (node) {
-					selected = node.selectedOptions.item(0).dataset.key;
-					addToLocalStorage(selectedOptionName, selected);
-				} else if (getFromLocalStorage(selectedOptionName)) {
-					selected = getFromLocalStorage(selectedOptionName);
-				}
-			} catch(err) {
-				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
-					console.error(err);
-				}
+			if (!parkingSelection) {
+				parkingSelection = "parkingTotal";
 			}
 
-			const selectedData = dataFromKey(data.features, selected);
+			const selectedData = dataFromKey(data.features, parkingSelection);
 			
 			const svg = select("#provinces svg");
 			const map = select("#provinces svg g.map");
@@ -103,23 +96,23 @@ export default {
 						.attr("d", path)
 						.attr("stroke", "#ffffff")
 						.attr("fill", function (d) {
-							return color(d.properties[selected]);
+							return color(d.properties[parkingSelection]);
 						})
 						// show information on hover
 						.append("title")
 						.text(function (d) {
 							const info = d.properties;
-							return `Provincie ${info.province} \n${info[selected]} parkeergelegenheden`;
+							return `Provincie ${info.province} \n${info[parkingSelection]} parkeergelegenheden`;
 						});
 				}, function (update) {
 					// update color and information of province
 					update.attr("fill", function (d) {
-							return color(d.properties[selected]);
+							return color(d.properties[parkingSelection]);
 						})
 						.selectAll("title")
 						.text(function (d) {
 							const info = d.properties;
-							return `Provincie ${info.province}\n${info[selected]} parkeergelegenheden`;
+							return `Provincie ${info.province}\n${info[parkingSelection]} parkeergelegenheden`;
 						});
 				}, function (exit) {
 					// remove province(s)
@@ -285,6 +278,28 @@ export default {
 					return arr.indexOf(a) === b;
 				});
 			}
+
+			function getSelectedOption(node, localStorageKey) {
+				try {
+					if (node && node.length > 0) {
+						const data = node.selectedOptions.item(0).dataset.key;
+						addToLocalStorage(localStorageKey, data);
+						return data;
+					} else if (node && node.length < 1) {
+						return getFromLocalStorage(localStorageKey);
+					} else {
+						return null;
+					}
+				} catch(err) {
+					if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
+						console.error(err);
+					} else if (node && node.length > 0) {
+						return node.selectedOptions.item(0).dataset.key;
+					} else {
+						return null;
+					}
+				}
+			}
 		
 			async function loadGeoJSON(path) {
 				const data = await json(path);
@@ -294,7 +309,7 @@ export default {
 			this.provinces = provinces;
 			this.drawMap = drawMap;
 			try {
-				this.mapSelection = getFromLocalStorage(selectedOptionName);
+				this.mapSelection = getFromLocalStorage(parkingLSKey);
 			} catch(err) {
 				if (err.name !== "SecurityError" && !err.message.includes("insecure")) {
 					console.error(err);
