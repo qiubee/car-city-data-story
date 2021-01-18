@@ -108,7 +108,7 @@ export default {
 					enter.append("path")
 						.attr("class", "province")
 						.attr("d", path)
-						.attr("stroke", "#ffffff")
+						.attr("stroke", "rgb(178, 172, 171")
 						.attr("fill", function (d) {
 							return color(d.properties[parkingSelection]);
 						})
@@ -147,8 +147,7 @@ export default {
 
 			legend.append("text")
 				.text(title)
-				.style("font-weight", "500")
-				.style("font-size", "0.85rem");
+				.attr("class", "title");
 
 			legend.append("g")
 				.attr("class", "scale");
