@@ -15,4 +15,4 @@ git push origin gh-pages
 git checkout master
 
 # return to original folder
-cd- 
+cd - 
