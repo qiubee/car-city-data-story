@@ -26,7 +26,7 @@ Gebruikte datasets:
 * [RDW: Open Data Parkeren: PARKING TOEGANG](https://opendata.rdw.nl/Parkeren/Open-Data-Parkeren-PARKING-TOEGANG/edv8-qiyg) (2020)
 * [RDW: Open Data Parkeren: GEBRUIKSDOEL](https://opendata.rdw.nl/Parkeren/Open-Data-Parkeren-GEBRUIKSDOEL/qidm-7mkf) (2020)
 
-### Meer informatie
+#### Meer informatie
 
 * [RIVM: Luchtkwaliteit - fijn stof](https://www.rivm.nl/ggd-richtlijn-medische-milieukunde-luchtkwaliteit-en-gezondheid/gezondheidseffecten-luchtverontreiniging/luchtkwaliteit-fijn-stof)
 * [Volkskrant: Hoe de fiets en de voetganger, met wat hulp van corona, de ruimte terugveroveren op de auto](https://www.volkskrant.nl/nieuws-achtergrond/hoe-de-fiets-en-de-voetganger-met-wat-hulp-van-corona-de-ruimte-terugveroveren-op-de-auto~b548e9ce/) (2020)
