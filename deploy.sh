@@ -12,7 +12,7 @@ cd dist
 git init
 git add --all
 git commit -m "update website"
-git push -f https://github.com/qiubee/frontend-applications.git master:gh-pages
+git push -f https://github.com/qiubee/car-city-data-story.git master:gh-pages
 
 # return to original folder
 cd - 
