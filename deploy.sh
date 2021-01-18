@@ -9,9 +9,10 @@ npm run build
 cd dist
 
 # push changes to gh-pages
+git init
 git add --all
 git commit -m "update website"
-git push origin gh-pages
+git push -f git@github.com:qiubee/frontend-applications.git master:gh-pages
 
 # return to original folder
 cd - 
