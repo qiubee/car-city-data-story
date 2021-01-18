@@ -234,8 +234,8 @@ export default {
 			
 			legend.append("text")
 				.text(title)
-				.style("font-weight", "500")
-				.style("font-size", "0.85rem");
+				.attr("class", "title")
+				.style("font-weight", "600");
 
 			legend.append("g")
 				.attr("class", "scale");
