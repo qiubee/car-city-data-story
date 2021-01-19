@@ -134,6 +134,15 @@ em {
 	font-style: italic;
 }
 
+body > span {
+	font-family: Tommy Soft;
+	font-weight: 600;
+	font-size: 1.1rem;
+	text-shadow: 0 0.1rem var(--light-green);
+	margin: 1rem 0.5rem;
+	color: var(--grey-blue);
+}
+
 body {
 	display: flex;
 	justify-content: center;
