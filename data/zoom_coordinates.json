@@ -1,0 +1,88 @@
+{
+	"provinces": [{
+		"province": "Groningen",
+		"scale": 3.5,
+		"coordinates": {
+			"x": -1550,
+			"y": 40
+		}
+	}, 
+	{
+		"province": "Flevoland",
+		"scale": 3.5,
+		"coordinates": {
+			"x": -1050,
+			"y": -450
+		}
+	},{
+		"province": "Friesland",
+		"scale": 2.95,
+		"coordinates": {
+			"x": -865,
+			"y": 35
+		}
+	},{
+		"province": "Drenthe",
+		"scale": 3.5,
+		"coordinates": {
+			"x": -1500,
+			"y": -180
+		}
+	},{
+		"province": "Overijssel",
+		"scale": 3.4,
+		"coordinates": {
+			"x": -1360,
+			"y": -460
+		}
+	},{
+		"province": "Gelderland",
+		"scale": 2.5,
+		"coordinates": {
+			"x": -775,
+			"y": -475
+		}
+	},{
+		"province": "Utrecht",
+		"scale": 5,
+		"coordinates": {
+			"x": -1390,
+			"y": -1240
+		}
+	},{
+		"province": "Noord-Holland",
+		"scale": 2.75,
+		"coordinates": {
+			"x": -500,
+			"y": -225
+		}
+	},{
+		"province": "Zuid-Holland",
+		"scale": 4,
+		"coordinates": {
+			"x": -680,
+			"y": -1025			
+		}
+	},{
+		"province": "Zeeland",
+		"scale": 4,
+		"coordinates": {
+			"x": -360,
+			"y": -1420
+		}
+	},{
+		"province": "Noord-Brabant",
+		"scale": 2.5,
+		"coordinates": {
+			"x": -530,
+			"y": -760
+		}
+	},{
+		"province": "Limburg",
+		"scale": 2.75,
+		"coordinates": {
+			"x": -850,
+			"y": -1020
+		}
+	}]
+}
